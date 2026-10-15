@@ -1,0 +1,21 @@
+name = $(shell jq -r .name config.json)
+vers = $(shell jq -r .version config.json)
+
+flag   = -D NAME=\"$(name)\" -D VERSION=\"$(vers)\"
+target = build/$(name)
+
+all: $(target)
+
+$(target): src/wordcount.c config.json
+	mkdir -p build
+	gcc $(flag) src/wordcount.c -o $(target)
+
+clean:
+	rm -rf build
+
+check: $(target)
+	@for t in test/*.txt; do \
+        $(target) $$t | diff $${t%.txt}.expected - || exit; \
+	done
+
+
