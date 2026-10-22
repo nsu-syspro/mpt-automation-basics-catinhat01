@@ -3,7 +3,9 @@ vers = $(shell jq -r .version config.json)
 
 flag   = -D NAME=\"$(name)\" -D VERSION=\"$(vers)\"
 target = build/$(name)
+
 tests  = $(wildcard test/*.txt)
+checks = $(tests:.txt=.check)
 
 all: $(target)
 
@@ -13,8 +15,7 @@ $(target): src/wordcount.c config.json
 
 clean:
 	rm -rf build
+check: $(checks)
 
-check: $(tests)
-
-$(tests): $(target)
-	$(target) $@ | diff $(@:.txt=.expected) -
+$(checks): %.check: %.txt %.expected $(target)
+	@$(target) $< | diff -u $*.expected -
