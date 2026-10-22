@@ -1,0 +1,4 @@
+check: wordcount
+	@for t in test/*.txt; do \
+		./wordcount $$t | diff $${t%.txt}.expected - || exit; \
+	done
